@@ -3,6 +3,8 @@ import logging
 import os.path
 import torch.optim as optim
 from models import BaxterFK
+from datasets import BaxterDataset
+from trainers import PoseFKTrainer
 
 
 def build_model(cfg_model):
@@ -19,6 +21,26 @@ def build_optimizer(cfg_stg, model, start_epoch):
     weight_decay = cfg_stg['weight_decay']
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
     return optimizer
+
+
+def build_augmentation(cfg_data):
+    # TODO
+    pass
+
+
+def build_dataset(cfg_data, transform):
+    if cfg_data['type'] == 'baxter':
+        dataset_class = BaxterDataset
+    trainset = dataset_class(cfg_data['train_set']['path'], transform)
+    testset = dataset_class(cfg_data['test_set']['path'], transform)
+    return trainset, testset
+
+
+def build_trainer(mode, task_config, device, resume):
+    if mode == 'pose_fk':
+        trainer_class = PoseFKTrainer
+    trainer = trainer_class(task_config, device, resume)
+    return trainer
 
 
 def create_logger(save_path, level=logging.INFO):

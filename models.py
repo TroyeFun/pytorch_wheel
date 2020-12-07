@@ -35,6 +35,6 @@ class BaxterFK(BaseModel):
         x = self.backbone(x)
         x = self.fc(x)
         pos, ori_pow2 = x[:, :4], x[:, 4:]
-        ori_pow2 = self.softmax(ori_pow2)
+        ori_pow2 = self.softmax(ori_pow2)  # w^2 + x^2 + y^2 + z^2 = 1
         return pos, ori_pow2
 

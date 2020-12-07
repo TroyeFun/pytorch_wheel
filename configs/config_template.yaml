@@ -1,3 +1,5 @@
+mode: 'pose_fk'
+
 fk:
   model:
     type: 'baxter_fk'
@@ -16,9 +18,11 @@ fk:
 
   dataset:
     type: 'baxter'
-    training_set:
+    train_set:
+      batch_size: 64
       path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
     test_set:
+      batch_size: 64
       path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
 
 ik:
@@ -39,7 +43,9 @@ ik:
 
   dataset:
     type: 'baxter'
-    training_set:
+    train_set:
+      batch_size: 64
       path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
     test_set:
+      batch_size: 64
       path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
