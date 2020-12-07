@@ -1,0 +1,45 @@
+fk:
+  model:
+    type: 'baxter_fk'
+    kwargs:
+      hidden_layers: [64, 64]
+
+  strategy:
+    base_lr: 0.01
+    lr_steps: [50, 80, 100]
+    lr_mults: [0.1, 0.1, 0.1]
+    momentum: 0.9
+    weight_decay: 0.0005
+    total_epochs: 110
+    save_path: '../../experments/ik_learning/fk_model/baxter_v0/'
+    resume_model: 'epoch_20_ckpt.pth.tar'
+
+  dataset:
+    type: 'baxter'
+    training_set:
+      path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
+    test_set:
+      path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
+
+ik:
+  model:
+    type: 'baxter_ik'
+    kwargs:
+      hidden_layers: [64, 64]
+
+  strategy:
+    base_lr: 0.01
+    lr_steps: [50, 80, 100]
+    lr_mults: [0.1, 0.1, 0.1]
+    momentum: 0.9
+    weight_decay: 0.0005
+    total_epochs: 110
+    save_path: '../../experments/ik_learning/ik_model/baxter_v0/'
+    resume_model: 'epoch_20_ckpt.pth.tar'
+
+  dataset:
+    type: 'baxter'
+    training_set:
+      path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
+    test_set:
+      path: '../../experiments/ik_learning/collect_data/201205-23-24/data.txt'
