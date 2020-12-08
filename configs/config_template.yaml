@@ -7,13 +7,13 @@ fk:
       hidden_layers: [64, 64]
 
   strategy:
-    base_lr: 0.01
-    lr_steps: [50, 80, 100]
+    base_lr: 0.05
+    lr_steps: [100, 150, 180]
     lr_mults: [0.1, 0.1, 0.1]
     momentum: 0.9
     weight_decay: 0.0005
-    total_epochs: 110
-    save_path: '../../experments/ik_learning/fk_model/baxter_v0/'
+    total_epochs: 200
+    save_path: '../../experiments/ik_learning/fk_model/baxter_v0/'
     resume_model: 'epoch_20_ckpt.pth.tar'
 
   dataset:

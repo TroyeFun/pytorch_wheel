@@ -3,43 +3,23 @@ import utils
 import os
 from os.path import join, exists
 import torch.nn.functional as F
+from .base_trainer import BaseTrainer
 
 
-class PoseFKTrainer:
+class PoseFKTrainer(BaseTrainer):
 
     def __init__(self, config, device, resume=False):
-        self.config = config
-        self.cfg_stg = config['strategy']
-        self.device = device
-
-        self.model = utils.build_model(config['model'])
-        self.model.to(device)
-
-        self.logger = utils.create_logger(self.cfg_stg['save_path'])
-
-        self.start_epoch = 0
-        if resume:
-            self.load_model()
-        self.optimizer = utils.build_optimizer(config['strategy'], self.model, self.start_epoch)
-
-    def load_model(self):
-        ckpt_path = join(self.cfg_stg['save_path'], 'checkpoint', self.cfg_stg['resume_model'])
-        ckpt = torch.load(ckpt_path, map_location=self.device)
-        self.start_epoch = ckpt['epoch'] + 1
-        self.model.load_state_dict(ckpt['state_dict'])
-
-    def save_model(self, epoch):
-        ckpt_path = join(self.cfg_stg['save_path'], 'checkpoint', 'epoch_{}_pth.tar'.format(epoch))
-        torch.save({'epoch': epoch, 'state_dict': self.model.state_dict()}, ckpt_path)
+        super().__init__(config, device, resume)
 
     def train(self, epoch, train_dataloader):
         self.model.train()
-        lr = update_lr(epoch, self.cfg_stg, self.optimizer)
+        lr = utils.update_lr(epoch, self.cfg_stg, self.optimizer)
         total_loss1 = 0
         total_loss2 = 0
         batch_num = 0
         for ang, pos, ori in train_dataloader:
             ang, pos, ori = ang.to(self.device), pos.to(self.device), ori.to(self.device)
+
             pred_pos, pred_ori_pow2 = self.model(ang)
 
             loss1, loss2 = self.criterion(pos, ori, pred_pos, pred_ori_pow2)
@@ -47,18 +27,17 @@ class PoseFKTrainer:
 
             self.optimizer.zero_grad()
             loss.backward()
-            self.optimizer.update()
+            self.optimizer.step()
 
             total_loss1 += loss1.item()
             total_loss2 += loss2.item()
             batch_num += 1
 
+        self.tb_logger.add_scalar('train_loss_pos', total_loss1 / batch_num, epoch)
+        self.tb_logger.add_scalar('train_loss_ori', total_loss2 / batch_num, epoch)
         if epoch % 1 == 0:
-            self.logger.info('Train: epoch {}, lr {}, loss_pos {}, loss_ori {}'.format(
+            self.logger.info('Train: epoch {}, lr {:.6f}, loss_pos {:.6f}, loss_ori {:.6f}'.format(
                 epoch, lr, total_loss1/batch_num, total_loss2/batch_num))
-
-        if epoch % 10 == 0:
-            self.save_model(epoch)
 
     def test(self, epoch, test_dataloader):
         self.model.eval()
@@ -66,6 +45,8 @@ class PoseFKTrainer:
         total_loss2 = 0
         batch_num = 0
         for ang, pos, ori in test_dataloader:
+            ang, pos, ori = ang.to(self.device), pos.to(self.device), ori.to(self.device)
+
             pred_pos, pred_ori_pow2 = self.model(ang)
 
             loss1, loss2 = self.criterion(pos, ori, pred_pos, pred_ori_pow2)
@@ -73,7 +54,9 @@ class PoseFKTrainer:
             total_loss1 += loss1.item()
             total_loss2 += loss2.item()
             batch_num += 1
-        self.logger.info('Test: epoch {}, loss_pos {}, loss_ori {}'.format(
+        self.tb_logger.add_scalar('test_loss_pos', total_loss1 / batch_num, epoch)
+        self.tb_logger.add_scalar('test_loss_ori', total_loss2 / batch_num, epoch)
+        self.logger.info('Test: epoch {}, loss_pos {:.6f}, loss_ori {:.6f}'.format(
             epoch, total_loss1/batch_num, total_loss2/batch_num))
 
     def criterion(self, pos, ori, pred_pos, pred_ori_pow2):

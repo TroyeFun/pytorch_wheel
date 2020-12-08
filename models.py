@@ -18,6 +18,7 @@ class BaseModel(nn.Module):
 class BaxterFK(BaseModel):
 
     def __init__(self, hidden_layers):
+        super().__init__()
         layers = []
 
         input_size = 7

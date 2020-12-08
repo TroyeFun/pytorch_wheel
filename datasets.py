@@ -19,7 +19,7 @@ class BaxterDataset(Dataset):
             line = line.strip().split(' ')
             line = list(map(float, line))
             data.append(line)
-        data = np.array(data)
+        data = np.array(data, dtype=np.float32)
         return data
 
     def __len__(self):
