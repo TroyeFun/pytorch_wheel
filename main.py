@@ -2,6 +2,8 @@ import argparse
 import yaml
 import utils
 from torch.utils.data import Dataloader
+import os
+import shutil
 
 if __name__ == '__main__':
     # set argparser
@@ -18,6 +20,12 @@ if __name__ == '__main__':
     mode = config['mode']
     if mode in ['pose_fk']:
         task_config = config['fk']
+    cfg_stg = task_config['strategy']
+
+    # create save dir and copy config
+    if not os.path.exists(cfg_stg['save_path']):
+        os.makedirs(cfg_stg['save_path'])
+    shutil.copy(args.config, cfg_stg['save_path'])
 
     # build dataloader
     cfg_data = task_config['dataset']
@@ -35,8 +43,7 @@ if __name__ == '__main__':
     if args.test_only:
         trainer.test(trainer.start_epoch-1, test_dataloader)
     else:
-        cfg_stg = task_config['strategy']
-        for epoch in range(trainer.start_epoch, cfg_data['total_epochs']):
+        for epoch in range(trainer.start_epoch, cfg_stg['total_epochs']):
             trainer.train(epoch, train_dataloader)
             if epoch % 10 == 0:
                 trainer.test(epoch, test_dataloader)
