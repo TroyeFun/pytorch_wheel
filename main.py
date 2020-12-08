@@ -27,6 +27,7 @@ if __name__ == '__main__':
     if not exists(join(cfg_stg['save_path'], 'checkpoint')):
         os.makedirs(join(cfg_stg['save_path'], 'checkpoint'))
     shutil.copy(args.config, join(cfg_stg['save_path'], 'config.yaml'))
+    print('Results are saved at ', cfg_stg['save_path'])
 
     # build dataloader
     cfg_data = task_config['dataset']

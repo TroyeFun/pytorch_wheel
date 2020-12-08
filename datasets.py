@@ -29,5 +29,5 @@ class BaxterDataset(Dataset):
         data = self.data[index]
         if self.transform is not None:
             data = self.transform(data)
-        ang, pos, ori = data[0:7], data[7:11], data[11:14]
+        ang, pos, ori = data[0:7], data[7:10], data[10:14]
         return ang, pos, ori

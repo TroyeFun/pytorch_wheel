@@ -23,7 +23,7 @@ class PoseFKTrainer(BaseTrainer):
             pred_pos, pred_ori_pow2 = self.model(ang)
 
             loss1, loss2 = self.criterion(pos, ori, pred_pos, pred_ori_pow2)
-            loss = loss1 + loss2
+            loss = loss1 + self.cfg_stg['loss_weight_ori'] * loss2
 
             self.optimizer.zero_grad()
             loss.backward()
@@ -60,6 +60,7 @@ class PoseFKTrainer(BaseTrainer):
             epoch, total_loss1/batch_num, total_loss2/batch_num))
 
     def criterion(self, pos, ori, pred_pos, pred_ori_pow2):
+        import ipdb; ipdb.set_trace()
         loss1 = F.mse_loss(pred_pos, pos)
         loss2 = self.kl_div(ori**2, pred_ori_pow2)
         return loss1, loss2

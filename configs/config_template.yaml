@@ -16,6 +16,9 @@ fk:
     save_path: '../../experiments/ik_learning/fk_model/baxter_v0/'
     resume_model: 'epoch_20_ckpt.pth.tar'
 
+    # customize
+    loss_weight_ori: 0.0
+
   dataset:
     type: 'baxter'
     train_set:
