@@ -60,7 +60,6 @@ class PoseFKTrainer(BaseTrainer):
             epoch, total_loss1/batch_num, total_loss2/batch_num))
 
     def criterion(self, pos, ori, pred_pos, pred_ori_pow2):
-        import ipdb; ipdb.set_trace()
         loss1 = F.mse_loss(pred_pos, pos)
         loss2 = self.kl_div(ori**2, pred_ori_pow2)
         return loss1, loss2
